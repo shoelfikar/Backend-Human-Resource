@@ -4,6 +4,7 @@ const sendEmail = require('../middleware/sendMail')
 const {v4: uuidv4} = require('uuid')
 const joi = require('joi')
 const {genSaltSync, hashSync, compareSync} = require('bcryptjs')
+const helpers = require('../helpers/helpers')
 
 
 
@@ -86,19 +87,14 @@ const login = (req, res)=> {
   .then((result)=> {
     const cekPassword = compareSync(user.password, result[0].password)
     if(cekPassword){
-      res.send({
-        result : result,
-        statusCode: 200,
-        message: 'login sukses'
-      })
+      delete result[0].password
+      helpers.response(res,result, 200,'Login success!', null)
     }else{
-      res.status(203).send('password salah')
+      helpers.response(res,null, 203,'password yang anda masukkan salah', null)
     }
   })
   .catch(()=> {
-    res.status(404).send({
-      message: 'email belum terdaftar, silahkan daftar terlebih dahulu'
-    })
+    helpers.response(res,null, 403,'email belum terdaftar, silahkan daftar terlebih dahulu', null)
   })
 }
 
