@@ -24,7 +24,19 @@ const cekUser = (email)=> {
   })
 }
 
+const getAllUser = ()=> {
+  return new Promise((resolve,reject) => {
+    db.query('SELECT * FROM user ', (err, result) => {
+      if(!err) {
+        resolve(result)
+      }else{
+        reject(new Error(err))
+      }
+    })
+  })
+}
 module.exports = {
   register,
-  cekUser
+  cekUser,
+  getAllUser
 }

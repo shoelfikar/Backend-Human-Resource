@@ -3,6 +3,7 @@ const valid = require('../middleware/validate')
 const sendEmail = require('../middleware/sendMail')
 const {v4: uuidv4} = require('uuid')
 const joi = require('joi')
+const jwt = require('jsonwebtoken')
 const {genSaltSync, hashSync, compareSync} = require('bcryptjs')
 const helpers = require('../helpers/helpers')
 
@@ -83,12 +84,19 @@ const login = (req, res)=> {
   const user = valid.user()
   user.email = email
   user.password = password
+  console.log(process.env.SECRET_KEY)
   userModel.cekUser(user.email)
   .then((result)=> {
     const cekPassword = compareSync(user.password, result[0].password)
     if(cekPassword){
-      delete result[0].password
-      helpers.response(res,result, 200,'Login success!', null)
+      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap}, process.env.SECRET_KEY, {expiresIn: '1h'})
+      const resultNew = {
+        id: result[0].id,
+        fullname: result[0].nama_lengkap,
+        username: result[0].username,
+        token: token
+      }
+      helpers.response(res,resultNew, 200,'Login success!', null)
     }else{
       helpers.response(res,null, 203,'password yang anda masukkan salah', null)
     }
@@ -99,7 +107,17 @@ const login = (req, res)=> {
 }
 
 
+const getAllUser = (req, res)=> {
+  userModel.getAllUser()
+  .then(result => {
+    helpers.response(res,result, 200,'Data all user', null)
+  })
+  .catch(err => {
+    helpers.response(res,null, 404,'something wrong!', err)
+  })
+}
 module.exports = {
   register,
-  login
+  login,
+  getAllUser
 }
