@@ -26,7 +26,16 @@ const user = ()=> {
   }
   return model
 }
+
+
+const updateUser = joi.object().keys({
+  nama_lengkap : joi.string().min(5),
+  username : joi.string().min(3),
+  foto : joi.string(),
+  phone: joi.string().min(8).max(15).regex(/^(\+62|62|0)/)
+})
 module.exports = {
   register,
-  user
+  user,
+  updateUser
 }

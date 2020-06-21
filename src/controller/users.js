@@ -116,8 +116,72 @@ const getAllUser = (req, res)=> {
     helpers.response(res,null, 404,'something wrong!', err)
   })
 }
+
+
+const getUser = (req, res)=> {
+  const idUser = req.params.idUser
+  userModel.getUser(idUser)
+  .then(result => {
+    if(result.length == 0){
+      helpers.response(res,null, 400,`id ${idUser} tidak ditemukan`, null)
+    }else{
+      delete result.password
+      helpers.response(res,result, 200,`data dari user dengan id: ${idUser}`, null)
+    }
+  })
+  .catch(err => {
+    helpers.response(res,null, 404,'something wrong!', err)
+  })
+}
+
+
+const updateUser = (req, res)=> {
+  const idUser = req.params.idUser
+  const {
+    nama_lengkap,
+    username,
+    foto,
+    phone
+  } = req.body
+  userModel.getUser(idUser)
+  .then(result => {
+    if(result == undefined){
+      helpers.response(res,null, 400,`id ${idUser} tidak ditemukan`, null)
+    }else{
+      const user = {
+        nama_lengkap : nama_lengkap || result.nama_lengkap,
+        username :username || result.username,
+        foto : foto || result.foto,
+        phone : phone || result.phone
+      }
+      joi.validate(req.body, valid.updateUser, (err)=> {
+        if(err){
+          res.json({
+            message : err.details[0].message
+          })
+        }else{
+          console.log(user)
+          userModel.updateUser(user, idUser)
+          .then(result => {
+            helpers.response(res,result, 200,`data dari id:${idUser} berhasil di update`, null)
+          })
+          .catch((err)=> {
+            console.log(err)
+            helpers.response(res,null, 404,'something wrong!', err)
+          })
+        }
+      })
+    }
+  })
+  .catch(err => {
+    console.log(err)
+    helpers.response(res,null, 404,'something wrong!', err)
+  })
+}
 module.exports = {
   register,
   login,
-  getAllUser
+  getAllUser,
+  getUser,
+  updateUser
 }

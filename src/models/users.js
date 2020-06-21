@@ -35,8 +35,35 @@ const getAllUser = ()=> {
     })
   })
 }
+
+const getUser = (idUser)=> {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT * FROM user WHERE id = ?', idUser, (err, result) => {
+      if(!err){
+        resolve(result[0])
+      }else{
+        reject(new Error(err))
+      }
+    })
+  })
+}
+
+
+const updateUser = (data, idUser)=> {
+  return new Promise((resolve, reject) => {
+    db.query('UPDATE user SET ? WHERE id = ?', [data, idUser], (err, result) => {
+      if(!err){
+        resolve(result)
+      }else{
+        reject(new Error(err))
+      }
+    })
+  })
+}
 module.exports = {
   register,
   cekUser,
-  getAllUser
+  getAllUser,
+  getUser,
+  updateUser
 }

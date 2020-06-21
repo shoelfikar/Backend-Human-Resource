@@ -7,7 +7,9 @@ const Router = express.Router()
 Router
     .post('/', userController.register)
     .post('/login', userController.login)
+    .get('/:idUser', userController.getUser)
     .get('/',auth.verify, userController.getAllUser)
+    .patch('/:idUser', userController.updateUser)
 
 
 
