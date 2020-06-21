@@ -60,10 +60,24 @@ const updateUser = (data, idUser)=> {
     })
   })
 }
+
+
+const deleteUser = (idUser)=> {
+  return new Promise((resolve, reject) => {
+    db.query('DELETE FROM user WHERE id = ?', idUser, (err, result) => {
+      if(!err){
+        resolve(result)
+      }else{
+        reject(new Error(err))
+      }
+    })
+  })
+}
 module.exports = {
   register,
   cekUser,
   getAllUser,
   getUser,
-  updateUser
+  updateUser,
+  deleteUser
 }

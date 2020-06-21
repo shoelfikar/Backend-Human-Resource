@@ -10,6 +10,7 @@ Router
     .get('/:idUser', userController.getUser)
     .get('/',auth.verify, userController.getAllUser)
     .patch('/:idUser', userController.updateUser)
+    .delete('/:idUser', userController.deleteUser)
 
 
 

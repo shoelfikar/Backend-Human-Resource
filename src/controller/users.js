@@ -18,7 +18,6 @@ const register = (req, res) => {
     foto,
     phone
   } = req.body
-
   const salt = genSaltSync(10)
   const user = valid.user()
   user.id = uuidv4()
@@ -80,7 +79,6 @@ const login = (req, res)=> {
     email,
     password
   } = req.body
-
   const user = valid.user()
   user.email = email
   user.password = password
@@ -178,10 +176,28 @@ const updateUser = (req, res)=> {
     helpers.response(res,null, 404,'something wrong!', err)
   })
 }
+
+
+const deleteUser = (req, res)=> {
+  const idUser = req.params.idUser
+  userModel.deleteUser(idUser)
+  .then(result => {
+    if(result.affectedRows == 0){
+      helpers.response(res,null, 400,`id ${idUser} tidak ditemukan`, null)
+    }else{
+      helpers.response(res,result, 200,`data dari id:${idUser} berhasil di hapus`, null)
+    } 
+  })
+  .catch(err => {
+    console.log(err)
+    helpers.response(res,null, 404,'something wrong!', err)
+  })
+}
 module.exports = {
   register,
   login,
   getAllUser,
   getUser,
-  updateUser
+  updateUser,
+  deleteUser
 }
