@@ -1,0 +1,32 @@
+define({ "api": [
+  {
+    "type": "post",
+    "url": "http://localhost:9000/api/v1/hrd/user/register",
+    "title": "register user",
+    "name": "register",
+    "group": "user",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "id",
+            "description": "<p>id user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "nama_lengkap",
+            "description": "<p>nama lengkap</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "src/controller/users.js",
+    "groupTitle": "user"
+  }
+] });

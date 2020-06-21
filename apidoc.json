@@ -1,0 +1,9 @@
+{
+    "name": "Documentasion API HRD 1.0",
+    "version": "0.1.0",
+    "description": "dokumentasi untuk menggunakan API",
+    "apidoc": {
+      "title": "HRD 1.0",
+      "url" : "http://localhost:9000/api/v1/hrd/"
+    }
+  }

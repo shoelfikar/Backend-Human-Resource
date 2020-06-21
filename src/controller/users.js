@@ -10,6 +10,14 @@ const {genSaltSync, hashSync, compareSync} = require('bcryptjs')
 const helpers = require('../helpers/helpers')
 
 
+/**
+ * @api {post} http://localhost:9000/api/v1/hrd/user/register register user
+ * @apiName  register
+ * @apiGroup user
+ * @apiSuccess {string} id id user
+ * @apiSuccess {string} nama_lengkap nama lengkap 
+ */
+
 
 const register = (req, res) => {
   const {
