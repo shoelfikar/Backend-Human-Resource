@@ -86,6 +86,22 @@ const confirmRegister = (idUser)=> {
     })
   })
 }
+
+
+const searchUser = (search)=> {
+  return new Promise((resolve, reject)=> {
+    db.query('SELECT * FROM user WHERE email LIKE ? OR nama_lengkap LIKE ? OR username LIKE ? OR phone LIKE ?', [`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`], (err, result)=> {
+      if(!err){
+        resolve(result)
+      }else{
+        reject(new Error(err))
+      }
+    })
+  })
+}
+
+
+
 module.exports = {
   register,
   cekUser,
@@ -93,5 +109,6 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  confirmRegister
+  confirmRegister,
+  searchUser
 }

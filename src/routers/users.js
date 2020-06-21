@@ -6,12 +6,13 @@ const Router = express.Router()
 
 Router
     .get('/activated', userController.confirmRegister)
-    .post('/', userController.register)
+    .get('/search',auth.verify, userController.searchUser)
+    .post('/register', userController.register)
     .post('/login', userController.login)
-    .get('/:idUser', userController.getUser)
+    .get('/:idUser',auth.verify, userController.getUser)
     .get('/',auth.verify, userController.getAllUser)
-    .patch('/:idUser', userController.updateUser)
-    .delete('/:idUser', userController.deleteUser)
+    .patch('/:idUser',auth.verify, userController.updateUser)
+    .delete('/:idUser',auth.verify, userController.deleteUser)
 
 
 

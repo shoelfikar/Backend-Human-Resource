@@ -214,6 +214,21 @@ const confirmRegister = (req, res)=> {
     }
   })
 }
+
+
+const searchUser = (req, res)=> {
+  const search = req.query.search
+  userModel.searchUser(search)
+  .then(result => {
+    helpers.response(res,result, 200,`data pencarian anda ditemukan`, null)
+  })
+  .catch(err => {
+    helpers.response(res,null, 200,`data pencarian user dengan keyword ${search} tidak ditemukan`, err)
+  })
+}
+
+
+
 module.exports = {
   register,
   login,
@@ -221,5 +236,6 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  confirmRegister
+  confirmRegister,
+  searchUser
 }
