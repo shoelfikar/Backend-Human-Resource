@@ -75,13 +75,15 @@ const deleteUser = (idUser)=> {
 }
 
 
-const confirmRegister = (confirm, idUser)=> {
-  db.query('UPDATE user SET confirm = ? WHERE id = ?', [confirm, idUser], (err, result)=> {
-    if(err){
-      console.log(err)
-    }else{
-      console.log(result)
-    }
+const confirmRegister = (idUser)=> {
+  return new Promise((resolve, reject)=> {
+    db.query('UPDATE user SET confirm = 1 WHERE id = ?',idUser, (err, result)=> {
+      if(!err){
+        resolve(result)
+      }else{
+        reject(new Error(err))
+      }
+    })
   })
 }
 module.exports = {

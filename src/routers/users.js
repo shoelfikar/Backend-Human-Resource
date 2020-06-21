@@ -5,6 +5,7 @@ const Router = express.Router()
 
 
 Router
+    .get('/activated', userController.confirmRegister)
     .post('/', userController.register)
     .post('/login', userController.login)
     .get('/:idUser', userController.getUser)

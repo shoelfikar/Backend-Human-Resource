@@ -4,6 +4,8 @@ const sendEmail = require('../middleware/sendMail')
 const {v4: uuidv4} = require('uuid')
 const joi = require('joi')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
+const mustache = require('mustache')
 const {genSaltSync, hashSync, compareSync} = require('bcryptjs')
 const helpers = require('../helpers/helpers')
 
@@ -43,11 +45,21 @@ const register = (req, res) => {
         }else{
           userModel.register(user)
           .then(() => {
-            const sendRegister = sendEmail.sendMail(user)
-            if(!sendRegister){
+            const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap}, process.env.SECRET_KEY)
+            // console.log(token)
+            const html = fs.readFileSync('./template/html/register.html', 'utf8')
+            const renderHtml = mustache.render(html, {nama: user.nama_lengkap, token: token})
+            const mailOptions = {
+              from: process.env.EMAIL,
+              to: user.email,
+              subject: 'Registrasi Akun',
+              html: renderHtml
+            }
+            const sendRegister = sendEmail.sendMail(mailOptions)
+            if(sendRegister){
               console.log(new Error('error'))
             }
-            helpers.response(res,user, 200,'Registrasi berhasil, cek email anda untuk activasi akun!', null)
+              helpers.response(res,user, 200,'Registrasi berhasil, cek email anda untuk activasi akun!', token)
           })
           .catch(err => {
             helpers.response(res,null, 404,'something wrong!', err)
@@ -185,17 +197,18 @@ const deleteUser = (req, res)=> {
 
 
 const confirmRegister = (req, res)=> {
-  const reqToken = req.query.activated
-  const confirm = 1
+  const reqToken = req.query.token
   jwt.verify(reqToken, process.env.SECRET_KEY, (err,result)=> {
     if(err){
+      console.log(err)
       helpers.response(res,null, 404,'failed activation', err)
     }else{
-      userModel.confirmRegister(confirm, result.id)
+      userModel.confirmRegister(result.id)
       .then(()=> {
         helpers.response(res,result, 200,'activation success', null)
       })
       .catch((err)=> {
+        console.log(err)
         helpers.response(res,null, 404,'failed activation', err)
       })
     }
