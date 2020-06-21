@@ -6,7 +6,7 @@ const register =  (data)=> {
       if(!err) {
         resolve(result)
       }else{
-        reject(new Error('Data sudah ada'))
+        reject(new Error(err))
       }
     })   
   })
@@ -73,11 +73,23 @@ const deleteUser = (idUser)=> {
     })
   })
 }
+
+
+const confirmRegister = (confirm, idUser)=> {
+  db.query('UPDATE user SET confirm = ? WHERE id = ?', [confirm, idUser], (err, result)=> {
+    if(err){
+      console.log(err)
+    }else{
+      console.log(result)
+    }
+  })
+}
 module.exports = {
   register,
   cekUser,
   getAllUser,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  confirmRegister
 }

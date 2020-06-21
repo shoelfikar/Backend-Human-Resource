@@ -21,6 +21,7 @@ const user = ()=> {
     phone : '',
     role : '',
     status : '',
+    confirm : '',
     createdAt : '',
     lastModified : ''
   }

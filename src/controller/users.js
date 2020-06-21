@@ -29,21 +29,17 @@ const register = (req, res) => {
   user.phone = phone
   user.role = 1
   user.status = 'active'
+  user.confirm = 0
   user.createdAt = new Date()
   user.lastModified = new Date()
   joi.validate(req.body, valid.register, (err,result)=> {
     if(err){
-      console.log(err)
-      res.status(400).send({
-        messages: err
-      })
+      helpers.response(res,null, 404,'failed',err.details[0].message )
     }else {
       userModel.cekUser(result.email)
       .then((result)=> {
         if(result.length === 1){
-          res.status(400).send({
-            message: 'Email anda sudah terdaftar!'
-          })
+          helpers.response(res,null, 403,'Email anda sudah terdaftar!', null)
         }else{
           userModel.register(user)
           .then(() => {
@@ -51,23 +47,15 @@ const register = (req, res) => {
             if(!sendRegister){
               console.log(new Error('error'))
             }
-            res.send({
-              result : user,
-              messages: 'register success',
-              status : 200
-            })
+            helpers.response(res,user, 200,'Registrasi berhasil, cek email anda untuk activasi akun!', null)
           })
           .catch(err => {
-            res.send({
-              err: err,
-              messages: 'failed to register',
-              status: 404
-            })
+            helpers.response(res,null, 404,'something wrong!', err)
           })
         }
         })
         .catch(err => {
-          console.log(err)
+          helpers.response(res,null, 404,'something wrong!', err)
         })
       }
   })
@@ -150,7 +138,8 @@ const updateUser = (req, res)=> {
         nama_lengkap : nama_lengkap || result.nama_lengkap,
         username :username || result.username,
         foto : foto || result.foto,
-        phone : phone || result.phone
+        phone : phone || result.phone,
+        lastModified : new Date()
       }
       joi.validate(req.body, valid.updateUser, (err)=> {
         if(err){
@@ -193,11 +182,31 @@ const deleteUser = (req, res)=> {
     helpers.response(res,null, 404,'something wrong!', err)
   })
 }
+
+
+const confirmRegister = (req, res)=> {
+  const reqToken = req.query.activated
+  const confirm = 1
+  jwt.verify(reqToken, process.env.SECRET_KEY, (err,result)=> {
+    if(err){
+      helpers.response(res,null, 404,'failed activation', err)
+    }else{
+      userModel.confirmRegister(confirm, result.id)
+      .then(()=> {
+        helpers.response(res,result, 200,'activation success', null)
+      })
+      .catch((err)=> {
+        helpers.response(res,null, 404,'failed activation', err)
+      })
+    }
+  })
+}
 module.exports = {
   register,
   login,
   getAllUser,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  confirmRegister
 }
