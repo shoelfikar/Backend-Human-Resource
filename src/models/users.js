@@ -102,6 +102,17 @@ const searchUser = (search)=> {
 
 
 
+const changePassword = (password,idUser)=> {
+  return new Promise((resolve, reject)=> {
+    db.query('UPDATE user SET password = ?  WHERE id = ?', [password, idUser], (err, result)=> {
+      if(!err){
+        resolve(result)
+      }else{
+        reject(err)
+      }
+    })
+  })
+}
 module.exports = {
   register,
   cekUser,
@@ -110,5 +121,6 @@ module.exports = {
   updateUser,
   deleteUser,
   confirmRegister,
-  searchUser
+  searchUser,
+  changePassword
 }

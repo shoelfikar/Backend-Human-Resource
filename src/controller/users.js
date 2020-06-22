@@ -53,7 +53,7 @@ const register = (req, res) => {
         }else{
           userModel.register(user)
           .then(() => {
-            const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap}, process.env.SECRET_KEY)
+            const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap, username : user.username, phone : user.phone}, process.env.SECRET_KEY)
             const html = fs.readFileSync('./template/html/register.html', 'utf8')
             const renderHtml = mustache.render(html, {nama: user.nama_lengkap, token: token})
             const mailOptions = {
@@ -66,7 +66,7 @@ const register = (req, res) => {
             if(sendRegister){
               console.log(new Error('error'))
             }
-              helpers.response(res,user, 200,'Registrasi berhasil, cek email anda untuk activasi akun!', token)
+              helpers.response(res,user, 200,'Registrasi berhasil, cek email anda untuk activasi akun!', null)
           })
           .catch(err => {
             helpers.response(res,null, 404,'something wrong!', err)
@@ -89,12 +89,11 @@ const login = (req, res)=> {
   const user = valid.user()
   user.email = email
   user.password = password
-  console.log(process.env.SECRET_KEY)
   userModel.cekUser(user.email)
   .then((result)=> {
     const cekPassword = compareSync(user.password, result[0].password)
     if(cekPassword){
-      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap}, process.env.SECRET_KEY, {expiresIn: '1h'})
+      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap, username: result[0].username, phone: result[0].phone}, process.env.SECRET_KEY, {expiresIn: '1h'})
       const resultNew = {
         id: result[0].id,
         fullname: result[0].nama_lengkap,
@@ -166,13 +165,11 @@ const updateUser = (req, res)=> {
             message : err.details[0].message
           })
         }else{
-          console.log(user)
           userModel.updateUser(user, idUser)
           .then(result => {
             helpers.response(res,result, 200,`data dari id:${idUser} berhasil di update`, null)
           })
           .catch((err)=> {
-            console.log(err)
             helpers.response(res,null, 404,'something wrong!', err)
           })
         }
@@ -207,7 +204,6 @@ const confirmRegister = (req, res)=> {
   const reqToken = req.query.token
   jwt.verify(reqToken, process.env.SECRET_KEY, (err,result)=> {
     if(err){
-      console.log(err)
       helpers.response(res,null, 404,'failed activation', err)
     }else{
       userModel.confirmRegister(result.id)
@@ -215,7 +211,6 @@ const confirmRegister = (req, res)=> {
         helpers.response(res,result, 200,'activation success', null)
       })
       .catch((err)=> {
-        console.log(err)
         helpers.response(res,null, 404,'failed activation', err)
       })
     }
@@ -236,6 +231,56 @@ const searchUser = (req, res)=> {
 
 
 
+const linkResetPassword = (req, res)=> {
+  const {
+    email
+  } = req.body
+  const data = email
+  userModel.cekUser(data)
+  .then(result => {
+    if(result.length == 0){
+      helpers.response(res,null, 404,`user dengan email ${data} tidak ditemukan`, null)
+    }else{
+      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap}, process.env.SECRET_KEY, {expiresIn: '1h'})
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: result[0].email,
+        subject: 'Reset Password',
+        html: `<p>Klik link untuk melakukan reset password <a href="http://localhost:9000/api/v1/hrd/user/reset/${token}">Reset Password</a></p>`
+      }
+      console.log(token)
+      sendEmail.sendMail(mailOptions)
+      helpers.response(res,result[0].email, 200,`link reset password telah di kirim ke email anda, ${data}`, null)
+    }
+  })
+  .catch(err => {
+    helpers.response(res,null, 403,'something wrong!', err)
+  })
+}
+
+
+
+const forgetPassword = (req, res)=> {
+  const reset = req.params.reset
+  const {
+    password
+  } = req.body
+  const salt = genSaltSync(10)
+  const data = hashSync(password, salt)
+  jwt.verify(reset, process.env.SECRET_KEY, (err, result)=> {
+    if(err){
+      helpers.response(res,null, 404,'token expired', err) 
+    }else{
+      userModel.changePassword(data, result.id)
+      .then(result => {
+        helpers.response(res,result, 200,'reset password berhasil,silahkan login kembali', null) 
+      })
+      .catch(err => {
+        helpers.response(res,null, 403,'something wrong!', err)
+      })
+    }
+  })
+}
 module.exports = {
   register,
   login,
@@ -244,5 +289,7 @@ module.exports = {
   updateUser,
   deleteUser,
   confirmRegister,
-  searchUser
+  searchUser,
+  linkResetPassword,
+  forgetPassword
 }
