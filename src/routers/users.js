@@ -9,6 +9,8 @@ Router
     .get('/search',auth.verify, userController.searchUser)
     .post('/register', userController.register)
     .post('/login', userController.login)
+    .get('/linkreset', userController.linkResetPassword)
+    .post('/forgetpassword/:reset', userController.forgetPassword)
     .get('/:idUser',auth.verify, userController.getUser)
     .get('/',auth.verify, userController.getAllUser)
     .patch('/:idUser',auth.verify, userController.updateUser)
