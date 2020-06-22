@@ -54,7 +54,6 @@ const register = (req, res) => {
           userModel.register(user)
           .then(() => {
             const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap}, process.env.SECRET_KEY)
-            // console.log(token)
             const html = fs.readFileSync('./template/html/register.html', 'utf8')
             const renderHtml = mustache.render(html, {nama: user.nama_lengkap, token: token})
             const mailOptions = {

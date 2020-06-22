@@ -67,6 +67,9 @@ const deleteRole = (roleId)=> {
     })
   })
 }
+
+
+
 module.exports = {
   createRole,
   readRole,
