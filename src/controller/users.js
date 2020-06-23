@@ -53,7 +53,7 @@ const register = (req, res) => {
         }else{
           userModel.register(user)
           .then(() => {
-            const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap, username : user.username, phone : user.phone}, process.env.SECRET_KEY)
+            const token = jwt.sign({id: user.id, email: user.email, nama_lengkap: user.nama_lengkap, username : user.username, phone : user.phone, confirm: user.confirm}, process.env.SECRET_KEY)
             const html = fs.readFileSync('./template/html/register.html', 'utf8')
             const renderHtml = mustache.render(html, {nama: user.nama_lengkap, token: token})
             const mailOptions = {
@@ -93,7 +93,7 @@ const login = (req, res)=> {
   .then((result)=> {
     const cekPassword = compareSync(user.password, result[0].password)
     if(cekPassword){
-      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap, username: result[0].username, phone: result[0].phone}, process.env.SECRET_KEY, {expiresIn: '1h'})
+      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap, username: result[0].username, phone: result[0].phone, confirm: result[0].confirm}, process.env.SECRET_KEY, {expiresIn: '1h'})
       const resultNew = {
         id: result[0].id,
         fullname: result[0].nama_lengkap,
@@ -241,7 +241,7 @@ const linkResetPassword = (req, res)=> {
     if(result.length == 0){
       helpers.response(res,null, 404,`user dengan email ${data} tidak ditemukan`, null)
     }else{
-      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap}, process.env.SECRET_KEY, {expiresIn: '1h'})
+      const token = jwt.sign({id: result[0].id, email: result[0].email, nama_lengkap: result[0].nama_lengkap, username: result[0].username, phone: result[0].phone, confirm: result[0].confirm}, process.env.SECRET_KEY, {expiresIn: '1h'})
       const mailOptions = {
         from: process.env.EMAIL,
         to: result[0].email,
